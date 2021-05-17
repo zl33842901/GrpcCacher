@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcCacher.Interfaces";
+
+package common;
+
+service CommonRpc {
+  rpc CallApi (RequestMessage) returns (ResponseMessage);
+}
+
+message RequestMessage {
+  string TableStandardName = 1;
+  string WhereParam = 2;
+  string OrderParam = 3;
+  int32 PageIndex = 4;
+  int32 PageSize = 5;
+  string SelectedFields = 6;
+}
+
+message ResponseMessage {
+  string ApiResult = 1;
+}
