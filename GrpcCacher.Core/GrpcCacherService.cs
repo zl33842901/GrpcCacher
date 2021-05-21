@@ -21,7 +21,6 @@ namespace GrpcCacher.Core
             return config.FuncRepository<T>()(connection);
         }
 
-
     }
 
     public interface IGrpcCacherService

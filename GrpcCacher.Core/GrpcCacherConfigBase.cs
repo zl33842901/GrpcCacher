@@ -20,11 +20,15 @@ namespace GrpcCacher.Core
 
         public Func<IDbConnection, IRepository<T>> FuncRepository<T>()
         {
+            return x => GetConfigItem<T>().GetRepository(x);
+        }
+
+        public GrpcCacherConfigItemBase<T> GetConfigItem<T>()
+        {
             if (!configItems.ContainsKey(typeof(T)))
                 throw new Exception($"类型{typeof(T).Name}不存在！");
             var item = configItems[typeof(T)] as GrpcCacherConfigItemBase<T>;
-
-            return x => item.GetRepository(x);
+            return item;
         }
 
         protected abstract GrpcCacherConfigItemBase<T> BornItem<T>(Expression<Func<T, DateTime>> lastUpdateTimeField);
@@ -42,6 +46,11 @@ namespace GrpcCacher.Core
         public Type Type => typeof(T);
 
         public abstract IRepository<T> GetRepository(IDbConnection connection);
+
+
+        internal List<T> ListValues = new List<T>();
+
+        internal DateTime LastUpdateTime = DateTime.MinValue;
     }
 
     public interface IGrpcCacherConfigItem

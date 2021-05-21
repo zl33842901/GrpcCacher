@@ -1,5 +1,8 @@
-﻿using Grpc.Net.Client;
+﻿using Grpc.Core;
+using Grpc.Net.Client;
+using GrpcCacher.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace GrpcCacher.Client
 {
@@ -11,13 +14,12 @@ namespace GrpcCacher.Client
             this.grpcSettings = grpcSettings;
         }
 
-        public string CallApi(string apiKey, string data)
+        public async Task<string> CallApi(string apiKey, string data)
         {
             GrpcChannel channel = GrpcChannel.ForAddress(grpcSettings.Host);
-            var service = channel.CreateGrpcService()
-            service.
-            //var grpcClient = new CommonRpc.CommonRpcClient(channel);
-            //var result = grpcClient.CallApi(new RequestMessage() { ApiUrl = apiKey, ApiParam = data }, new CallOptions(null, DateTime.Now.ToUniversalTime().AddSeconds(grpcSettings.TimeoutBySeconds)));
+            Interfaces.CommonRpc.CommonRpcClient client = new Interfaces.CommonRpc.CommonRpcClient(channel);
+            
+            var result = await client.CallApiAsync(new RequestMessage() {  }, new CallOptions(null, DateTime.Now.ToUniversalTime().AddSeconds(grpcSettings.TimeoutBySeconds)));
             //return result.ApiResult;
 
             return string.Empty;
