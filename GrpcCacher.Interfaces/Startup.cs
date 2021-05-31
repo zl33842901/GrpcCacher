@@ -23,7 +23,7 @@ namespace GrpcCacher.Interfaces
             services.AddScoped<IDbConnection>(x => new SqlConnection("server=127.0.0.1;user id=sa;password=zhanglei;database=CWFP_DCC_Devlop;Max Pool Size=300;"));
             services.AddGrpcCacher((sp, config) =>
             {
-                config.AddDatasource<DCC_Depart>(x => x.LastUpdateTime);
+                config.AddDatasource<DCC_Depart>(x => x.LastUpdateTime, x => x.Id);
             });
             services.AddGrpc();
         }

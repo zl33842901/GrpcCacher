@@ -10,17 +10,12 @@ namespace GrpcCacher.Core
     public abstract class GrpcCacherConfigBase
     {
         private Dictionary<Type, IGrpcCacherConfigItem> configItems = new Dictionary<Type, IGrpcCacherConfigItem>();
-        public GrpcCacherConfigBase AddDatasource<T>(Expression<Func<T, DateTime>> lastUpdateTimeField) where T:class
+        public GrpcCacherConfigBase AddDatasource<T>(Expression<Func<T, DateTime>> lastUpdateTimeField, Expression<Func<T, int>> keyField) where T:class
         {
             if (configItems.ContainsKey(typeof(T)))
                 throw new Exception($"类型{typeof(T).Name}已存在！");
-            configItems.Add(typeof(T), BornItem(lastUpdateTimeField));
+            configItems.Add(typeof(T), BornItem(lastUpdateTimeField, keyField));
             return this;
-        }
-
-        public Func<IDbConnection, IRepository<T>> FuncRepository<T>()
-        {
-            return x => GetConfigItem<T>().GetRepository(x);
         }
 
         public GrpcCacherConfigItemBase<T> GetConfigItem<T>()
@@ -31,26 +26,24 @@ namespace GrpcCacher.Core
             return item;
         }
 
-        protected abstract GrpcCacherConfigItemBase<T> BornItem<T>(Expression<Func<T, DateTime>> lastUpdateTimeField);
+        protected abstract GrpcCacherConfigItemBase<T> BornItem<T>(Expression<Func<T, DateTime>> lastUpdateTimeField, Expression<Func<T, int>> keyField);
     }
 
     public abstract class GrpcCacherConfigItemBase<T> : IGrpcCacherConfigItem
     {
-        public GrpcCacherConfigItemBase(Expression<Func<T, DateTime>> lastUpdateTimeField)
+        public GrpcCacherConfigItemBase(Expression<Func<T, DateTime>> lastUpdateTimeField, Expression<Func<T, int>> keyField)
         {
             LastUpdateTimeField = lastUpdateTimeField;
+            KeyField = keyField;
         }
 
         public Expression<Func<T, DateTime>> LastUpdateTimeField { get; }
 
+        public Expression<Func<T, int>> KeyField { get; }
+
         public Type Type => typeof(T);
 
         public abstract IRepository<T> GetRepository(IDbConnection connection);
-
-
-        internal List<T> ListValues = new List<T>();
-
-        internal DateTime LastUpdateTime = DateTime.MinValue;
     }
 
     public interface IGrpcCacherConfigItem

@@ -16,15 +16,19 @@ namespace GrpcCacher.Core
             this.connection = connection;
         }
 
-        private IRepository<T> GetRepository<T>()
+        private GrpcCacherConfigItemBase<T> GetConfigItem<T>()
         {
-            return config.FuncRepository<T>()(connection);
+            return config.GetConfigItem<T>();
         }
 
+        public GrpcCacherItemService<T> GetItemService<T>()
+        {
+            return new GrpcCacherItemService<T>(GetConfigItem<T>(), connection);
+        }
     }
 
     public interface IGrpcCacherService
     {
-
+        GrpcCacherItemService<T> GetItemService<T>();
     }
 }
