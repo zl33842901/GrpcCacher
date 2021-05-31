@@ -47,7 +47,7 @@ namespace GrpcCacher.Core
         {
             var member = keyField.Body as MemberExpression;
             if (member == null)
-                throw new Exception("lastUpdateField 不是标准的属性表达式：" + keyField.ToString());
+                throw new Exception("keyField 不是标准的属性表达式：" + keyField.ToString());
             ParameterExpression para = Expression.Parameter(typeof(T), keyField.Parameters.Single().Name);
             MethodCallExpression met = Expression.Call(Expression.Constant(Li), typeof(List<TKey>).GetMethod("Contains"), member);
             Expression<Func<T, bool>> lamb = Expression.Lambda<Func<T, bool>>(met, para);
@@ -73,6 +73,46 @@ namespace GrpcCacher.Core
                     DataList = new ConcurrentBag<T>(result);
                 }
             }
+        }
+
+        public async Task<List<T>> Where(Expression<Func<T, bool>> expression)
+        {
+            await LoadInfo();
+            var result = DataList.Where(expression.Compile()).ToList();
+            return result;
+        }
+
+        public async Task<List<T>> WhereOrder<TKey>(Expression<Func<T, bool>> expression, Expression<Func<T, TKey>> order, bool desc = false, int top = 0)
+        {
+            await LoadInfo();
+            var list = DataList.Where(expression.Compile());
+            if (desc)
+                list = list.OrderByDescending(order.Compile());
+            else
+                list = list.OrderBy(order.Compile());
+            if (top > 0)
+                list = list.Take(top);
+            return list.ToList();
+        }
+
+        public async Task<(List<T>, int)> PageList<TKey>(Expression<Func<T, bool>> expression, Expression<Func<T, TKey>> order, bool desc, int pageIndex, int pageSize)
+        {
+            await LoadInfo();
+            var list = DataList.Where(expression.Compile());
+            var total = list.Count();
+            if (desc)
+                list = list.OrderByDescending(order.Compile());
+            else
+                list = list.OrderBy(order.Compile());
+            list = list.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+            return (list.ToList(), total);
+        }
+
+        public async Task<int> Count(Expression<Func<T, bool>> expression)
+        {
+            await LoadInfo();
+            var result = DataList.Count(expression.Compile());
+            return result;
         }
     }
 }
