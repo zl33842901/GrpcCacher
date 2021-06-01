@@ -10,7 +10,7 @@ using xLiAd.DapperEx.Repository;
 
 namespace GrpcCacher.Core
 {
-    public class GrpcCacherItemService<T>
+    public class GrpcCacherItemService<T> : IGrpcCacherItemService
     {
         private static ConcurrentBag<T> DataList;
         private static DateTime lastLoadTime = DateTime.MinValue;
@@ -115,4 +115,6 @@ namespace GrpcCacher.Core
             return result;
         }
     }
+
+    public interface IGrpcCacherItemService { }
 }

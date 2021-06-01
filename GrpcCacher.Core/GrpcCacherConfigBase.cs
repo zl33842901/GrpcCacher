@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using xLiAd.DapperEx.Repository;
@@ -24,6 +25,15 @@ namespace GrpcCacher.Core
                 throw new Exception($"类型{typeof(T).Name}不存在！");
             var item = configItems[typeof(T)] as GrpcCacherConfigItemBase<T>;
             return item;
+        }
+
+        public IGrpcCacherConfigItem GetConfigItem(string typeName)
+        {
+            var items = configItems.Where(x => x.Key.Name.Equals(typeName));
+            if(!items.Any())
+                throw new Exception($"类型{typeName}不存在！");
+            var item = items.First();
+            return item.Value;
         }
 
         protected abstract GrpcCacherConfigItemBase<T> BornItem<T>(Expression<Func<T, DateTime>> lastUpdateTimeField, Expression<Func<T, int>> keyField);

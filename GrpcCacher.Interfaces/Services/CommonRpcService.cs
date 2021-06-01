@@ -1,4 +1,5 @@
 using Grpc.Core;
+using GrpcCacher.Interfaces.Services;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -10,14 +11,23 @@ namespace GrpcCacher.Interfaces
     public class CommonRpcService : CommonRpc.CommonRpcBase
     {
         private readonly ILogger<CommonRpcService> _logger;
-        public CommonRpcService(ILogger<CommonRpcService> logger)
+        private readonly ICommandProcessService commandProcessService;
+        public CommonRpcService(ILogger<CommonRpcService> logger, ICommandProcessService commandProcessService)
         {
             _logger = logger;
+            this.commandProcessService = commandProcessService;
         }
 
-        public override Task<ResponseMessage> CallApi(RequestMessage request, ServerCallContext context)
+        public override async Task<ResponseMessage> CallApi(RequestMessage request, ServerCallContext context)
         {
-            return Task.FromResult(new ResponseMessage() { ApiResult="abc" });
+            try
+            {
+                return await commandProcessService.Process(request);
+            }
+            catch(Exception ex)
+            {
+                return $"³ö´íÁË£º{ex.Message}".ToResponseError();
+            }
         }
     }
 }

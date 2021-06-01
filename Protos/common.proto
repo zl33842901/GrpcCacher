@@ -9,14 +9,19 @@ service CommonRpc {
 }
 
 message RequestMessage {
-  string TableStandardName = 1;
-  string WhereParam = 2;
-  string OrderParam = 3;
-  int32 PageIndex = 4;
-  int32 PageSize = 5;
-  string SelectedFields = 6;
+  string CommandName = 1;
+  string TableStandardName = 2;
+  string WhereParam = 3;
+  string OrderParam = 4;
+  bool Desc = 5;
+  int32 PageIndex = 6;
+  int32 PageSize = 7;
+  string SelectedFields = 8;
 }
 
 message ResponseMessage {
-  string ApiResult = 1;
+  bool Success = 1;
+  string Data = 2;
+  int32 Total = 3;
+  string Message = 4;
 }

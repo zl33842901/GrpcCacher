@@ -1,4 +1,5 @@
 ﻿using GrpcCacher.Interfaces.Entities;
+using GrpcCacher.Interfaces.Services;
 using GrpcCacher.SqlServer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,6 +26,7 @@ namespace GrpcCacher.Interfaces
             {
                 config.AddDatasource<DCC_Depart>(x => x.LastUpdateTime, x => x.Id);
             });
+            services.AddScoped<ICommandProcessService, CommandProcessService>();
             services.AddGrpc();
         }
 
